@@ -53,7 +53,6 @@ def centralityAnalysis(commits: List[git.Commit], outputDir: str):
     # output non-tabular results
     with open(outputDir + '\projectAnalysis.csv', 'a', newline='') as f:
         w = csv.writer(f, delimiter=',')
-        w.writerow(['Metric','Value'])
         w.writerow(['Density', density])
         w.writerow(['Community Count', len(modularity)])
         
