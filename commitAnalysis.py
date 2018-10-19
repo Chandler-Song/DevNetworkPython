@@ -3,13 +3,15 @@ import git
 import csv
 import os
 from collections import Counter
+from progress.bar import Bar
     
 def commitAnalysis(commits: List[git.Commit], outputDir: str):
     
     authorInfoDict = {}
     
     # traverse all commits
-    for commit in commits:
+    print("Analyzing commits...")
+    for commit in Bar('Processing').iter(commits):
         
         # extract info
         author = commit.author.email
@@ -48,6 +50,25 @@ def commitAnalysis(commits: List[git.Commit], outputDir: str):
     # save count of unique authors
     authorCount = len([*authorInfoDict])
     
+    # get timezone count
+    print("Analyzing timezones...")
+    timezonesCounter = Counter(timezone 
+                               for author in authorInfoDict 
+                               for timezone in authorInfoDict[author]['timezones'])
+    
+    # calculate amount of sponsored devs
+    print("Analyzing sponsored authors...")
+    sponsoredAuthorCount = 0
+    for author in authorInfoDict:
+        info = authorInfoDict[author]
+        commitCount = int(info['commitCount'])
+        sponsoredCommitCount = int(info['sponsoredCommitCount'])
+        diff = sponsoredCommitCount / commitCount
+        if diff >= .95:
+            sponsoredAuthorCount += 1
+    
+    print("Outputting CSVs...")
+    
     # output author days on project
     with open(os.path.join(outputDir, 'authorDaysOnProject.csv'), 'a', newline='') as f:
         w = csv.writer(f, delimiter=',')
@@ -57,11 +78,6 @@ def commitAnalysis(commits: List[git.Commit], outputDir: str):
             latestDate = authorInfoDict[author]['latestCommitDate']
             diff = latestDate - earliestDate
             w.writerow([author,diff.days + 1])
-    
-    # output timezone count
-    timezonesCounter = Counter(timezone 
-                               for author in authorInfoDict 
-                               for timezone in authorInfoDict[author]['timezones'])
     
     with open(os.path.join(outputDir, 'timezones.csv'), 'a', newline='') as f:
         w = csv.writer(f, delimiter=',')
@@ -75,16 +91,6 @@ def commitAnalysis(commits: List[git.Commit], outputDir: str):
         w.writerow(['Author','Commit Count'])
         for author in authorInfoDict:
             w.writerow([author,authorInfoDict[author]['commitCount']])
-    
-    # calculate amount of sponsored devs
-    sponsoredAuthorCount = 0
-    for author in authorInfoDict:
-        info = authorInfoDict[author]
-        commitCount = int(info['commitCount'])
-        sponsoredCommitCount = int(info['sponsoredCommitCount'])
-        diff = sponsoredCommitCount / commitCount
-        if diff >= .95:
-            sponsoredAuthorCount += 1
         
     # output project info
     with open(os.path.join(outputDir, 'projectAnalysis.csv'), 'a', newline='') as f:

@@ -6,6 +6,7 @@ import networkx as nx
 from networkx.algorithms.community import greedy_modularity_communities
 import csv
 import matplotlib.pyplot as plt
+from progress.bar import Bar
 
 def centralityAnalysis(commits: List[git.Commit], outputDir: str):
 
@@ -13,7 +14,8 @@ def centralityAnalysis(commits: List[git.Commit], outputDir: str):
     allRelatedAuthors = {}
     
     # for all commits...
-    for commit in commits:
+    print("Analyzing centrality...")
+    for commit in Bar('Processing').iter(commits):
         author = commit.author.email
         
         # initialize dates for related author analysis
@@ -32,6 +34,7 @@ def centralityAnalysis(commits: List[git.Commit], outputDir: str):
         authorRelatedAuthors.update(commitRelatedAuthors)
 
     # prepare graph
+    print("Preparing NX graph...")
     G = nx.Graph()
     
     for author in allRelatedAuthors:
@@ -44,6 +47,8 @@ def centralityAnalysis(commits: List[git.Commit], outputDir: str):
     centrality = dict(nx.degree_centrality(G))
     density = nx.density(G)
     modularity = list(greedy_modularity_communities(G))
+    
+    print("Outputting CSVs...")
     
     # output non-tabular results
     with open(outputDir + '\projectAnalysis.csv', 'a', newline='') as f:
@@ -80,6 +85,7 @@ def centralityAnalysis(commits: List[git.Commit], outputDir: str):
             w.writerow(combined[key])
             
     # output graph to PNG
+    print("Outputting graph to PNG...")
     graphFigure = plt.figure(5,figsize=(30,30))
     nx.draw(G, with_labels=True, node_color='orange', node_size=4000, edge_color='black', linewidths=2, font_size=20)
     graphFigure.savefig(outputDir + '\centralityGraph.png')

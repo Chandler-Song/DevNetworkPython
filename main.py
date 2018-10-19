@@ -7,16 +7,21 @@ from commitAnalysis import commitAnalysis
 from centralityAnalysis import centralityAnalysis
 
 # parse arguments
-repoUrl = 'https://github.com/apache/gora'
-destPath = r'C:\Users\denio\source\repos\gora'
-outputDir = r'C:\Users\denio\source\repos\DeveloperNetwork\PythonSrc\analysisOutput'
-aliasPath = r'C:\Users\denio\source\repos\DeveloperNetwork\PythonSrc\aliases\apachegora.yml'
+repoUrl = 'https://github.com/qemu/qemu'
+destPath = r'D:\Repos\qemu5'
+outputDir = r'D:\Repos\DevNetworkPython\analysisOutput'
+aliasPath = None
+
+class Progress(git.remote.RemoteProgress):
+    def update(self, op_code, cur_count, max_count=None, message=''):
+        print('%s, %s'%('{0:.0%}'.format(cur_count / max_count), message))
 
 try:    
     # get repository reference
     repo = None
     if not os.path.isdir(destPath):
-        repo = git.Repo.clone_from(repoUrl, destPath, branch='master')
+        print("Downloading repository...")
+        repo = git.Repo.clone_from(repoUrl, destPath, branch='master', progress=Progress())        
     else:
         repo = git.Repo(destPath)
         
@@ -36,3 +41,4 @@ try:
 finally:
     # close repo to avoid resource leaks
     del repo
+    

@@ -1,7 +1,12 @@
+import os
 import git
 import yaml
 
 def replaceAliases(repo: git.Repo, aliasPath: str):
+    
+    # nothing to do if no alias file
+    if aliasPath == None or not os.path.exists(aliasPath):
+        return repo.iter_commits()
     
     # read aliases
     content = ""
