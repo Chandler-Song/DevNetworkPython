@@ -89,7 +89,7 @@ def commitAnalysis(commits: List[git.Commit], outputDir: str):
             w.writerow([author,authorInfoDict[author]['commitCount']])
         
     # output project info
-    with open(os.path.join(outputDir, 'projectAnalysis.csv'), 'a', newline='') as f:
+    with open(os.path.join(outputDir, 'project.csv'), 'a', newline='') as f:
         w = csv.writer(f, delimiter=',')
         w.writerow(['AuthorCount',len([*authorInfoDict])])
         w.writerow(['SponsoredAuthorCount',sponsoredAuthorCount])

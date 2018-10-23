@@ -8,8 +8,8 @@ from centralityAnalysis import centralityAnalysis
 from tagAnalysis import tagAnalysis
 
 # parse arguments
-repoUrl = 'https://github.com/apache/gora'
-destPath = r'C:\Users\denio\source\repos\gora'
+repoUrl = 'https://github.com/apache/mahout'
+destPath = r'C:\Users\denio\source\repos\apachemahout'
 outputDir = r'C:\Users\denio\source\repos\analysisOutput'
 aliasPath = None
 
@@ -41,7 +41,7 @@ try:
     # run analysis
     tagAnalysis(repo, outputDir)
     commitAnalysis(commits, outputDir)
-    centralityAnalysis(commits, outputDir)
+    centralityAnalysis(repo, commits, outputDir)
     
 finally:
     # close repo to avoid resource leaks
