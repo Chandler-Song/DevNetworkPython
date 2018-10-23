@@ -9,8 +9,8 @@ from tagAnalysis import tagAnalysis
 
 # parse arguments
 repoUrl = 'https://github.com/apache/mahout'
-destPath = r'C:\Users\denio\source\repos\apachemahout'
-outputDir = r'C:\Users\denio\source\repos\analysisOutput'
+destPath = r'D:\Repos\mahout'
+outputDir = r'D:\Repos\analysisOutput'
 aliasPath = None
 
 def commitDate(tag):
@@ -18,16 +18,18 @@ def commitDate(tag):
 
 class Progress(git.remote.RemoteProgress):
     def update(self, op_code, cur_count, max_count=None, message=''):
-        print(self._cur_line)
+        print(self._cur_line, end="\r")
 
 try:    
     # get repository reference
     repo = None
     if not os.path.isdir(destPath):
         print("Downloading repository...")
-        repo = git.Repo.clone_from(repoUrl, destPath, branch='master', progress=Progress(), odbt=git.GitCmdObjectDB)        
+        repo = git.Repo.clone_from(repoUrl, destPath, branch='master', progress=Progress(), odbt=git.GitCmdObjectDB)   
+        print()
     else:
         repo = git.Repo(destPath, odbt=git.GitCmdObjectDB)
+        
         
     # delete any existing output files
     if os.path.exists(outputDir):

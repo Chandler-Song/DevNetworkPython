@@ -29,12 +29,14 @@ def centralityAnalysis(repo: git.Repo, commits: List[git.Commit], outputDir: str
         latestDate = commitDate + relativedelta(months=+1)
         
         # find authors related to this commit
-        commitRelatedCommits = commit.iter_items(
-                repo, 'master',
-                after=earliestDate.strftime('%Y-%m-%d'),
-                before=latestDate.strftime('%Y-%m-%d'))
-    
-        commitRelatedCommits = filter(lambda c: author != c.author.email, commits)
+#        commitRelatedCommits = commit.iter_items(
+#                repo, 'master',
+#                after=earliestDate.strftime('%Y-%m-%d'),
+#                before=latestDate.strftime('%Y-%m-%d'))
+        
+        commitRelatedCommits = filter(lambda c:
+            findRelatedCommits(author, earliestDate, latestDate, c), commits)
+        
         commitRelatedAuthors = set(list(map(lambda c: c.author.email, commitRelatedCommits)))
         
         # get current related authors collection and update it
