@@ -7,16 +7,20 @@ from networkx.algorithms.community import greedy_modularity_communities
 import csv
 import matplotlib.pyplot as plt
 from progress.bar import Bar
+from collections import Counter
 
 def centralityAnalysis(commits: List[git.Commit], outputDir: str):
 
-    # define dictionary of authors and authors related to them
     allRelatedAuthors = {}
+    authorCommits = Counter({})
     
     # for all commits...
     print("Analyzing centrality...")
     for commit in Bar('Processing').iter(commits):
         author = commit.author.email
+        
+        # increase author commit count
+        authorCommits.update({author:1})
         
         # initialize dates for related author analysis
         commitDate = datetime.fromtimestamp(commit.committed_date)
@@ -51,17 +55,18 @@ def centralityAnalysis(commits: List[git.Commit], outputDir: str):
     print("Outputting CSVs...")
     
     # output non-tabular results
-    with open(outputDir + '\projectAnalysis.csv', 'a', newline='') as f:
+    with open(outputDir + '\\projectAnalysis.csv', 'a', newline='') as f:
         w = csv.writer(f, delimiter=',')
         w.writerow(['Density', density])
         w.writerow(['Community Count', len(modularity)])
         
     # output community information
-    with open(outputDir + '\communityAuthors.csv', 'a', newline='') as f:
+    with open(outputDir + '\\communityAuthors.csv', 'a', newline='') as f:
         w = csv.writer(f, delimiter=',')
-        w.writerow(['Community Index', 'Author Count'])
+        w.writerow(['Community Index', 'Author Count', 'Commit Count'])
         for idx, community in enumerate(modularity):
-            w.writerow([idx+1, len(modularity[idx])])
+            communityCommitCount = sum(authorCommits[author] for author in community)
+            w.writerow([idx+1, len(modularity[idx]), communityCommitCount])
     
     # combine centrality results
     combined = {}
@@ -76,7 +81,7 @@ def centralityAnalysis(commits: List[git.Commit], outputDir: str):
         combined[key] = single
     
     # output tabular results
-    with open(outputDir + '\centralityAnalysis.csv', 'w', newline='') as f:
+    with open(outputDir + '\\centralityAnalysis.csv', 'w', newline='') as f:
         w = csv.DictWriter(f, ['Author','Closeness','Betweenness','Centrality'])
         w.writeheader()
         
@@ -87,7 +92,7 @@ def centralityAnalysis(commits: List[git.Commit], outputDir: str):
     print("Outputting graph to PNG...")
     graphFigure = plt.figure(5,figsize=(30,30))
     nx.draw(G, with_labels=True, node_color='orange', node_size=4000, edge_color='black', linewidths=2, font_size=20)
-    graphFigure.savefig(outputDir + '\centralityGraph.png')
+    graphFigure.savefig(outputDir + '\\centralityGraph.png')
 
 # helper functions
 def findRelatedCommits(author, earliestDate, latestDate, commit):

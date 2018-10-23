@@ -8,6 +8,7 @@ from progress.bar import Bar
 def commitAnalysis(commits: List[git.Commit], outputDir: str):
     
     authorInfoDict = {}
+    timezoneInfoDict = {}
     
     # traverse all commits
     print("Analyzing commits...")
@@ -18,9 +19,20 @@ def commitAnalysis(commits: List[git.Commit], outputDir: str):
         timezone = commit.author_tz_offset
         time = commit.authored_datetime
         
+        # get timezone
+        timezoneInfo = timezoneInfoDict.setdefault(timezone, dict(
+                commitCount=0,
+                authors=set()
+        ))
+        
         # save author
+        timezoneInfo['authors'].add(author)
+        
+        # increase commit count
+        timezoneInfo['commitCount'] += 1
+        
+        # get author
         authorInfo = authorInfoDict.setdefault(author, dict(
-                timezones= {},
                 commitCount= 0,
                 sponsoredCommitCount= 0,
                 earliestCommitDate=time,
@@ -35,27 +47,10 @@ def commitAnalysis(commits: List[git.Commit], outputDir: str):
         if (time < authorInfo['earliestCommitDate']):
             authorInfo['earliestCommitDate'] = time
         
-        # ignore undtermined timezones
-        if commit.author_tz_offset == 0:
-            continue
-        
-        # increase timezone count
-        timezoneCount = authorInfo['timezones'].setdefault(str(timezone), 0)
-        timezoneCount += 1
-        
         # check if commit was between 9 and 5
-        if time.hour >= 9 and time.hour <= 17:
+        if not commit.author_tz_offset == 0 and time.hour >= 9 and time.hour <= 17:
             authorInfo['sponsoredCommitCount'] += 1
         
-    # save count of unique authors
-    authorCount = len([*authorInfoDict])
-    
-    # get timezone count
-    print("Analyzing timezones...")
-    timezonesCounter = Counter(timezone 
-                               for author in authorInfoDict 
-                               for timezone in authorInfoDict[author]['timezones'])
-    
     # calculate amount of sponsored devs
     print("Analyzing sponsored authors...")
     sponsoredAuthorCount = 0
@@ -81,9 +76,10 @@ def commitAnalysis(commits: List[git.Commit], outputDir: str):
     
     with open(os.path.join(outputDir, 'timezones.csv'), 'a', newline='') as f:
         w = csv.writer(f, delimiter=',')
-        w.writerow(['Timezone Offset','Commit Count'])
-        for timezone in timezonesCounter:
-            w.writerow([timezone,timezonesCounter[timezone]])
+        w.writerow(['Timezone Offset','Author Count','Commit Count'])
+        for timezone in timezoneInfoDict:
+            timezoneInfo = timezoneInfoDict[timezone]
+            w.writerow([timezone,len(timezoneInfo['authors']),timezoneInfo['commitCount']])
             
     # output commits per author
     with open(os.path.join(outputDir, 'commitsPerAuthor.csv'), 'a', newline='') as f:
@@ -95,6 +91,6 @@ def commitAnalysis(commits: List[git.Commit], outputDir: str):
     # output project info
     with open(os.path.join(outputDir, 'projectAnalysis.csv'), 'a', newline='') as f:
         w = csv.writer(f, delimiter=',')
-        w.writerow(['AuthorCount',authorCount])
+        w.writerow(['AuthorCount',len([*authorInfoDict])])
         w.writerow(['SponsoredAuthorCount',sponsoredAuthorCount])
-        w.writerow(['TimezoneCount',len(timezonesCounter)])
+        w.writerow(['TimezoneCount',len([*timezoneInfoDict])])
