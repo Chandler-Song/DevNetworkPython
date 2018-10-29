@@ -1,9 +1,11 @@
-from typing import List
 import git
 import csv
 import os
+
+from typing import List
 from collections import Counter
 from progress.bar import Bar
+from datetime import datetime
     
 def commitAnalysis(commits: List[git.Commit], outputDir: str):
     
@@ -61,6 +63,11 @@ def commitAnalysis(commits: List[git.Commit], outputDir: str):
         diff = sponsoredCommitCount / commitCount
         if diff >= .95:
             sponsoredAuthorCount += 1
+            
+    # calculate active project days
+    firstCommitDate = datetime.fromtimestamp(commits[len(commits) - 1].committed_date)
+    lastCommitDate = datetime.fromtimestamp(commits[0].committed_date)
+    daysActive = (lastCommitDate - firstCommitDate).days	
     
     print("Outputting CSVs...")
     
@@ -91,6 +98,7 @@ def commitAnalysis(commits: List[git.Commit], outputDir: str):
     # output project info
     with open(os.path.join(outputDir, 'project.csv'), 'a', newline='') as f:
         w = csv.writer(f, delimiter=',')
+        w.writerow(['DaysActive', daysActive])
         w.writerow(['AuthorCount',len([*authorInfoDict])])
         w.writerow(['SponsoredAuthorCount',sponsoredAuthorCount])
         w.writerow(['TimezoneCount',len([*timezoneInfoDict])])

@@ -9,8 +9,8 @@ from tagAnalysis import tagAnalysis
 
 # parse arguments
 repoUrl = 'https://github.com/apache/mahout'
-destPath = r'D:\Repos\mahout'
-outputDir = r'D:\Repos\analysisOutput'
+destPath = r'C:\Users\denio\source\repos\apachemahout'
+outputDir = r'C:\Users\denio\source\repos\analysisOutput'
 aliasPath = None
 
 def commitDate(tag):

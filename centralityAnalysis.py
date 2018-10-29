@@ -1,12 +1,13 @@
 import os
-from typing import List
 import git
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
 import networkx as nx
-from networkx.algorithms.community import greedy_modularity_communities
 import csv
 import matplotlib.pyplot as plt
+
+from typing import List
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from networkx.algorithms.community import greedy_modularity_communities
 from progress.bar import Bar
 from collections import Counter
 
