@@ -33,78 +33,66 @@ def main():
         # close repo to avoid resource leaks
         del repo
 
-def extractAliases(commits: typing.Iterable[git.Commit], aliasPath: str, maxDistance: int):
+def extractAliases(commits: typing.Iterable[git.Commit], aliasPath: str, maxDistance: float):
     
-    # get set of all authors
-    authors = set(list(commit.author.email.lower().strip() for commit in Bar('Processing').iter(list(commits))))
+    # get all distinct authors
+    authors = list(set(list(commit.author.email.lower().strip() for commit in Bar('Processing').iter(list(commits)))))
     
-    # find all A>B aliases
-    allAliases = set()
-    lcs = MetricLCS()
-    expr = r'(.+)@'
-    
-    for authorA in Bar('Processing').iter(authors):
-        for authorB in authors:
-            if (authorA == authorB):
-                continue
-                            
-            localPartAMatches = re.findall(expr, authorA)
-            localPartBMatches = re.findall(expr, authorB)
-            
-            if (len(localPartAMatches) == 0):
-                localPartAMatches = [authorA]
-                
-            if (len(localPartBMatches) == 0):
-                localPartBMatches = [authorB]
-            
-            distance = lcs.distance(localPartAMatches[0], localPartBMatches[0])
-            
-            if (distance > maxDistance):
-                continue
-                
-            aliasKey = authorA + ">" + authorB
-            allAliases.add(aliasKey)
-                
-    # normalize to one alias and its derivatives
-    normalizedAliases = {}
-    usedAsKeys = set()
+    aliases = {}
     usedAsValues = {}
     
-    for alias in Bar('Processing').iter(allAliases):
-        split = alias.split('>')
-        frm = split[0]
-        to = split[1]
+    for authorA in Bar('Processing').iter(authors):
         
-        if to in usedAsKeys:
-            normalized = normalizedAliases.setdefault(to, set())
-            normalized.add(frm)
-            usedAsKeys.add(to)
-            usedAsValues[frm] = to
+        # go through used values
+        if authorA in usedAsValues:
+            continue
+        
+        # go through already extracted keys
+        quickMatched = False
+        for key in aliases:
+            if authorA == key:
+                quickMatched = True
+                continue
             
-        elif frm in usedAsValues:
-            parent = usedAsValues[frm]
-            normalized = normalizedAliases.setdefault(parent, set())
-            normalized.add(to)
-            usedAsValues[to] = parent
+            if (areSimilar(authorA, key, maxDistance)):
+                aliases[key].append(authorA)
+                usedAsValues[authorA] = key
+                quickMatched = True
+                break
             
-        elif to in usedAsValues:
-            parent = usedAsValues[to]
-            normalized = normalizedAliases.setdefault(parent, set())
-            normalized.add(frm)
-            usedAsValues[frm] = parent
+        if quickMatched:
+            continue
+        
+        # go through all authors
+        for authorB in authors:
+            if authorA == authorB:
+                continue
             
-        else: #if frm in usedAsKeys:
-            normalized = normalizedAliases.setdefault(frm, set())
-            normalized.add(to)
-            usedAsKeys.add(frm)
-            usedAsValues[to] = frm
-            
-    # make all sets lists for cleaner output
-    for alias in normalizedAliases:
-        normalizedAliases[alias] = list(normalizedAliases[alias])
+            if (areSimilar(authorA, authorB, maxDistance)):
+                aliasedAuthor = aliases.setdefault(authorA, [])
+                aliasedAuthor.append(authorB)
+                usedAsValues[authorB] = authorA
+                break
     
     # output to yaml
     with open(aliasPath, 'a', newline='') as f:                
-        yaml.dump(normalizedAliases, f)
+        yaml.dump(aliases, f)
+        
+def areSimilar(valueA: str, valueB: str, maxDistance: float):
+    lcs = MetricLCS()
+    expr = r'(.+)@'
+    
+    localPartAMatches = re.findall(expr, valueA)
+    localPartBMatches = re.findall(expr, valueB)
+    
+    if (len(localPartAMatches) == 0):
+        localPartAMatches = [valueA]
+        
+    if (len(localPartBMatches) == 0):
+        localPartBMatches = [valueB]
+    
+    distance = lcs.distance(localPartAMatches[0], localPartBMatches[0])
+    
+    return distance <= maxDistance
         
 main()

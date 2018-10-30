@@ -1,5 +1,5 @@
 !!python/object:__main__.Configuration
 repositoryUrl: 'https://github.com/qemu/qemu'
-repositoryPath: 'C:\Users\denio\source\repos\qemu'
-analysisOutputPath: 'C:\Users\denio\source\repos\analysisOutput'
-aliasPath: 'C:\Users\denio\source\repos\DevNetworkPython\aliases\qemu.yml'
+repositoryPath: 'D:\Repos\qemu'
+analysisOutputPath: 'D:\Repos\analysisOutput'
+aliasPath: 'D:\Repos\DevNetworkPython\aliases\qemu.yml'
