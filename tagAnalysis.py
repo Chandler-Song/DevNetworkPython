@@ -3,14 +3,16 @@ import git
 import csv
 from datetime import datetime
 
+from progress.bar import Bar
+
 def tagAnalysis(repo: git.Repo, outputDir: str):
-    print("Analyzing tags...")
+    print("Analyzing tags")
 
     tagInfo = []
     tags = sorted(repo.tags, key=getTaggedDate)
     
     lastTag = None
-    for tag in tags:
+    for tag in Bar('Processing').iter(tags):
         commitCount = 0
         if (lastTag == None):
             commitCount = len(list(tag.commit.iter_items(repo, tag.commit)))
@@ -32,7 +34,7 @@ def tagAnalysis(repo: git.Repo, outputDir: str):
         w.writerow(['Tag Count', len(tagInfo)])
 
     # output tag info
-    print("Outputting CSVs...")
+    print("Outputting CSVs")
     with open(os.path.join(outputDir, 'tags.csv'), 'a', newline='') as f:
         w = csv.writer(f, delimiter=',')
         w.writerow(['Path', 'Date', 'Commit Count'])

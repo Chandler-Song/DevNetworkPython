@@ -13,7 +13,7 @@ def commitAnalysis(commits: List[git.Commit], outputDir: str):
     timezoneInfoDict = {}
     
     # traverse all commits
-    print("Analyzing commits...")
+    print("Analyzing commits")
     for commit in Bar('Processing').iter(commits):
         
         # extract info
@@ -54,7 +54,7 @@ def commitAnalysis(commits: List[git.Commit], outputDir: str):
             authorInfo['sponsoredCommitCount'] += 1
         
     # calculate amount of sponsored devs
-    print("Analyzing sponsored authors...")
+    print("Analyzing sponsored authors")
     sponsoredAuthorCount = 0
     for author in authorInfoDict:
         info = authorInfoDict[author]
@@ -69,7 +69,7 @@ def commitAnalysis(commits: List[git.Commit], outputDir: str):
     lastCommitDate = datetime.fromtimestamp(commits[0].committed_date)
     daysActive = (lastCommitDate - firstCommitDate).days	
     
-    print("Outputting CSVs...")
+    print("Outputting CSVs")
     
     # output author days on project
     with open(os.path.join(outputDir, 'authorDaysOnProject.csv'), 'a', newline='') as f:

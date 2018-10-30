@@ -17,7 +17,7 @@ def centralityAnalysis(repo: git.Repo, commits: List[git.Commit], outputDir: str
     authorCommits = Counter({})
     
     # for all commits...
-    print("Analyzing centrality...")
+    print("Analyzing centrality")
     for commit in Bar('Processing').iter(commits):
         author = commit.author.email
         
@@ -45,7 +45,7 @@ def centralityAnalysis(repo: git.Repo, commits: List[git.Commit], outputDir: str
         authorRelatedAuthors.update(commitRelatedAuthors)
 
     # prepare graph
-    print("Preparing NX graph...")
+    print("Preparing NX graph")
     G = nx.Graph()
     
     for author in allRelatedAuthors:
@@ -59,7 +59,7 @@ def centralityAnalysis(repo: git.Repo, commits: List[git.Commit], outputDir: str
     density = nx.density(G)
     modularity = list(greedy_modularity_communities(G))
     
-    print("Outputting CSVs...")
+    print("Outputting CSVs")
     
     # output non-tabular results
     with open(os.path.join(outputDir, 'project.csv'), 'a', newline='') as f:
@@ -96,7 +96,7 @@ def centralityAnalysis(repo: git.Repo, commits: List[git.Commit], outputDir: str
             w.writerow(combined[key])
             
     # output graph to PNG
-    print("Outputting graph to PNG...")
+    print("Outputting graph to PNG")
     graphFigure = plt.figure(5,figsize=(30,30))
     nx.draw(G, with_labels=True, node_color='orange', node_size=4000, edge_color='black', linewidths=2, font_size=20)
     graphFigure.savefig(os.path.join(outputDir, 'graph.png'))
