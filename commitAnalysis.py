@@ -99,6 +99,8 @@ def commitAnalysis(commits: List[git.Commit], outputDir: str):
     with open(os.path.join(outputDir, 'project.csv'), 'a', newline='') as f:
         w = csv.writer(f, delimiter=',')
         w.writerow(['DaysActive', daysActive])
+        w.writerow(['FirstCommitDate', '{:%Y-%m-%d}'.format(firstCommitDate)])
+        w.writerow(['LastCommitDate', '{:%Y-%m-%d}'.format(lastCommitDate)])
         w.writerow(['AuthorCount',len([*authorInfoDict])])
         w.writerow(['SponsoredAuthorCount',sponsoredAuthorCount])
         w.writerow(['TimezoneCount',len([*timezoneInfoDict])])
