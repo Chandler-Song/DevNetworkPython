@@ -48,9 +48,6 @@ def extractAliases(repo: git.Repo, aliasPath: str, repoShortname: str, token: st
     shasByEmail = {}
     for email in Bar('Processing').iter(emails):
         
-        #if (email.find('gcapan') == -1):
-            #continue
-        
         commit = next(commit
                    for commit in commits
                    if commit.author.email.lower() == email)
