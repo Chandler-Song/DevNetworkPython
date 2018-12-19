@@ -1,7 +1,7 @@
 !!python/object:__main__.Configuration
-repositoryUrl: 'https://github.com/apache/mahout'
-repositoryShortname: 'apache/mahout'
-repositoryPath: 'D:\Repos\apachemahout'
+repositoryUrl: "https://github.com/apache/gora"
+repositoryShortname: "apache/gora"
+repositoryPath: 'D:\Repos\apachegora'
 analysisOutputPath: 'D:\Repos\analysisOutput'
-aliasPath: 'D:\Repos\DevNetworkPython\aliases\apachemahout.yml'
+aliasPath: 'D:\Repos\DevNetworkPython\aliases\apachegora.yml'
 aliasSimilarityMaxDistance: 0.25

@@ -38,7 +38,8 @@ def main():
         del repo
 
 def extractAliases(repo: git.Repo, aliasPath: str, repoShortname: str, token: str, maxDistance: float):
-    commits = list(repo.iter_commits());
+    commits = list(filter(lambda c:
+        not c.author is None and not c.author.email is None, repo.iter_commits()));
     
     # get all distinct author emails
     emails = set(commit.author.email.lower()
