@@ -2,14 +2,16 @@ import os
 import git
 import yaml
 
+from typing import List
 from progress.bar import Bar
+from utils import authorIdExtractor
 
-def replaceAliases(repo: git.Repo, aliasPath: str):
+def replaceAliases(commits: List[git.Commit], aliasPath: str):
     print("Cleaning aliased authors")
     
     # quick lowercase and trim if no alias file
     if aliasPath == None or not os.path.exists(aliasPath):
-        return replaceAll(repo.iter_commits(), {})
+        return replaceAll(commits, {})
     
     # read aliases
     content = ""
@@ -25,12 +27,12 @@ def replaceAliases(repo: git.Repo, aliasPath: str):
             transposesAliases[email] = alias
             
     # replace all author aliases with a unique one
-    return replaceAll(repo.iter_commits(), transposesAliases)
+    return replaceAll(commits, transposesAliases)
 
 def replaceAll(commits, aliases):
     for commit in Bar('Processing').iter(list(commits)):
         copy = commit
-        author = commit.author.email.lower().strip()
+        author = authorIdExtractor(commit.author)
         
         if author in aliases:
             copy.author.email = aliases[author]

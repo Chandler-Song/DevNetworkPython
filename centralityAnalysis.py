@@ -10,6 +10,7 @@ from dateutil.relativedelta import relativedelta
 from networkx.algorithms.community import greedy_modularity_communities
 from progress.bar import Bar
 from collections import Counter
+from utils import authorIdExtractor
 
 def centralityAnalysis(repo: git.Repo, commits: List[git.Commit], outputDir: str):
 
@@ -19,7 +20,7 @@ def centralityAnalysis(repo: git.Repo, commits: List[git.Commit], outputDir: str
     # for all commits...
     print("Analyzing centrality")
     for commit in Bar('Processing').iter(commits):
-        author = commit.author.email
+        author = authorIdExtractor(commit.author)
         
         # increase author commit count
         authorCommits.update({author:1})
@@ -38,7 +39,7 @@ def centralityAnalysis(repo: git.Repo, commits: List[git.Commit], outputDir: str
         commitRelatedCommits = filter(lambda c:
             findRelatedCommits(author, earliestDate, latestDate, c), commits)
         
-        commitRelatedAuthors = set(list(map(lambda c: c.author.email, commitRelatedCommits)))
+        commitRelatedAuthors = set(list(map(lambda c: authorIdExtractor(c.author), commitRelatedCommits)))
         
         # get current related authors collection and update it
         authorRelatedAuthors = allRelatedAuthors.setdefault(author, set())
@@ -103,7 +104,7 @@ def centralityAnalysis(repo: git.Repo, commits: List[git.Commit], outputDir: str
 
 # helper functions
 def findRelatedCommits(author, earliestDate, latestDate, commit):
-    isDifferentAuthor = author != commit.author.email
+    isDifferentAuthor = author != authorIdExtractor(commit.author)
     if not isDifferentAuthor:
         return False
         

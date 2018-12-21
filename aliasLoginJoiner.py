@@ -8,6 +8,7 @@ import re
 from configuration import Configuration
 from repoLoader import getRepo
 from progress.bar import Bar
+from utils import authorIdExtractor
 from similarity.metric_lcs import MetricLCS
 
 def main():
@@ -38,11 +39,10 @@ def main():
         del repo
 
 def extractAliases(repo: git.Repo, aliasPath: str, repoShortname: str, token: str, maxDistance: float):
-    commits = list(filter(lambda c:
-        not c.author is None and not c.author.email is None, repo.iter_commits()));
+    commits = list(repo.iter_commits())
     
     # get all distinct author emails
-    emails = set(commit.author.email.lower()
+    emails = set(authorIdExtractor(commit.author)
                  for commit in Bar('Processing').iter(commits))
     
     # get a commit per email
@@ -50,8 +50,8 @@ def extractAliases(repo: git.Repo, aliasPath: str, repoShortname: str, token: st
     for email in Bar('Processing').iter(emails):
         
         commit = next(commit
-                   for commit in commits
-                   if commit.author.email.lower() == email)
+                   for commit in repo.iter_commits()
+                   if authorIdExtractor(commit.author) == email)
         
         shasByEmail[email] = commit.hexsha
     
@@ -68,10 +68,8 @@ def extractAliases(repo: git.Repo, aliasPath: str, repoShortname: str, token: st
         if not 'author' in commit.keys():
             continue
         
-        author = commit['author']
-        
-        if not author is None:
-            loginsByEmail[email] = author['login']
+        if not commit['author']['login'] is None:
+            loginsByEmail[email] = commit['author']['login']
         else:
             emailsWithoutLogins.append(email)
             

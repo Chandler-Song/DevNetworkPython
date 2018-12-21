@@ -3,9 +3,9 @@ import csv
 import os
 
 from typing import List
-from collections import Counter
 from progress.bar import Bar
 from datetime import datetime
+from utils import authorIdExtractor
     
 def commitAnalysis(commits: List[git.Commit], outputDir: str):
     
@@ -17,7 +17,7 @@ def commitAnalysis(commits: List[git.Commit], outputDir: str):
     for commit in Bar('Processing').iter(commits):
         
         # extract info
-        author = commit.author.email
+        author = authorIdExtractor(commit.author)
         timezone = commit.author_tz_offset
         time = commit.authored_datetime
         

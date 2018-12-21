@@ -1,7 +1,7 @@
 !!python/object:__main__.Configuration
-repositoryUrl: "https://github.com/eclipse-cdt/cdt"
-repositoryShortname: "eclipse-cdt/cdt"
-repositoryPath: 'D:\Repos\cdt'
-analysisOutputPath: 'D:\Repos\analysisOutput'
-aliasPath: 'D:\Repos\DevNetworkPython\aliases\eclipsecdt.yml'
+repositoryUrl: "https://github.com/eclipse/rt.equinox.bundles"
+repositoryShortname: "eclipse/rt.equinox.bundles"
+repositoryPath: 'D:\Repos\rt.equinox.bundles'
+analysisOutputPath: 'D:\Repos\analysisOutput\eclipse-rt.equinox.bundles'
+aliasPath: 'D:\Repos\analysisOutput\aliases\eclipse-rt.equinox.bundles.yml'
 aliasSimilarityMaxDistance: 0.25

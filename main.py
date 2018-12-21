@@ -28,7 +28,7 @@ def main():
         os.makedirs(config.analysisOutputPath)
         
         # handle aliases
-        commits = list(replaceAliases(repo, config.aliasPath))
+        commits = list(replaceAliases(repo.iter_commits(), config.aliasPath))
             
         # run analysis
         tagAnalysis(repo, config.analysisOutputPath)
