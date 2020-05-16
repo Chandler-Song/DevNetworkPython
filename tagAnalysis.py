@@ -9,6 +9,7 @@ def tagAnalysis(repo: git.Repo, outputDir: str):
     print("Analyzing tags")
 
     tagInfo = []
+    print("Sorting (no progress available, may take several minutes to complete)")
     tags = sorted(repo.tags, key=getTaggedDate)
     
     lastTag = None

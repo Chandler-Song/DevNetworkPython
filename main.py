@@ -1,5 +1,4 @@
-import os
-import shutil
+import sys, getopt, os, subprocess, shutil
 import git
 import yaml
 
@@ -10,13 +9,33 @@ from commitAnalysis import commitAnalysis
 from centralityAnalysis import centralityAnalysis
 from tagAnalysis import tagAnalysis
 
-def main():
+FILEBROWSER_PATH = os.path.join(os.getenv('WINDIR'), 'explorer.exe')
+
+def main(argv):
     try:
+        # get configuration file path
+        configFile = ''
+        try:
+            opts, args = getopt.getopt(argv,"hc:",["config="])
+        except getopt.GetoptError:
+            print('ERROR: incorrect arguments!\nmain.py -c <config.yml>')
+            sys.exit(2)
+        for opt, arg in opts:
+            if opt == '-h' or opt == '--help':
+                print('main.py -c <config.yml>')
+                sys.exit()
+            elif opt in ("-c", "--config"):
+                configFile = arg
+        
+        # validate file
+        if not os.path.exists(configFile):
+            sys.exit('ERROR: configuration file not found')
+
         # read configuration
         config = ...  # type: Configuration
-        with open('config.yml', 'r', encoding='utf-8-sig') as file:
+        with open(configFile, 'r', encoding='utf-8-sig') as file:
             content = file.read()
-            config = yaml.load(content)
+            config = yaml.load(content, Loader=yaml.FullLoader)
         
         # get repository reference
         repo = getRepo(config)
@@ -34,10 +53,14 @@ def main():
         tagAnalysis(repo, config.analysisOutputPath)
         commitAnalysis(commits, config.analysisOutputPath)
         centralityAnalysis(repo, commits, config.analysisOutputPath)
+
+        # open output directory
+        explore(config.analysisOutputPath)
         
     finally:
         # close repo to avoid resource leaks
-        del repo
+        if 'repo' in locals():
+            del repo
 
 class Progress(git.remote.RemoteProgress):
     def update(self, op_code, cur_count, max_count=None, message=''):
@@ -46,4 +69,15 @@ class Progress(git.remote.RemoteProgress):
 def commitDate(tag):
     return tag.commit.committed_date
 
-main()
+# https://stackoverflow.com/a/50965628
+def explore(path):
+    # explorer would choke on forward slashes
+    path = os.path.normpath(path)
+
+    if os.path.isdir(path):
+        subprocess.run([FILEBROWSER_PATH, path])
+    elif os.path.isfile(path):
+        subprocess.run([FILEBROWSER_PATH, '/select,', os.path.normpath(path)])
+
+if __name__ == "__main__":
+   main(sys.argv[1:])
