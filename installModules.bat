@@ -1,10 +1,12 @@
 # create virtual environment to avoid polluting global namespace
-python -m venv .venv
+.\py -m venv .venv
 
 # activate environment
-.venv/Scripts./Activate.ps1
+.\.venv/Scripts./Activate.ps1
 
 # install modules
+pip uninstall pip
+pip install --upgrade pip==20.1.1
 pip install 'wheel==0.34.2'
 pip install 'networkx==2.4'
 pip install 'matplotlib==3.2.1'
