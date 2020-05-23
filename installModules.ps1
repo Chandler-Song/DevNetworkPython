@@ -1,11 +1,15 @@
 # create virtual environment to avoid polluting global namespace
-.\py -m venv .venv
+py -m venv .venv
 
 # activate environment
-.\.venv/Scripts./Activate.ps1
+.venv/Scripts./Activate.ps1
+
+# install pip
+pip uninstall pip
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+py get-pip.py pip==20.1.1
 
 # install modules
-pip uninstall pip
 pip install --upgrade pip==20.1.1
 pip install 'wheel==0.34.2'
 pip install 'networkx==2.4'
