@@ -41,22 +41,22 @@ def graphqlAnalysis(pat: str, repoShortName: str, outputDir: str):
     with open(os.path.join(outputDir, "numberCommitsPR.csv"), "a", newline="") as f:
         w = csv.writer(f, delimiter=",")
         w.writerow(["PR Number", "Commit Count"])
-        for prNumber in prCommitCount.keys():
-            w.writerow([prNumber, prCommitCount[prNumber]])
+        for key in prCommitCount.keys():
+            w.writerow([key, prCommitCount[key]])
 
     with open(
         os.path.join(outputDir, "numberDevelopersIssue.csv"), "a", newline=""
     ) as f:
         w = csv.writer(f, delimiter=",")
         w.writerow(["Issue Number", "Developer Count"])
-        for prNumber in issueParticipantCount.keys():
-            w.writerow([issueParticipantCount, issueParticipantCount[prNumber]])
+        for key in issueParticipantCount.keys():
+            w.writerow([key, issueParticipantCount[key]])
 
     with open(os.path.join(outputDir, "numberDevelopersPR.csv"), "a", newline="") as f:
         w = csv.writer(f, delimiter=",")
         w.writerow(["PR Number", "Developer Count"])
-        for prNumber in prParticipantCount.keys():
-            w.writerow([prParticipantCount, prParticipantCount[prNumber]])
+        for key in prParticipantCount.keys():
+            w.writerow([key, prParticipantCount[key]])
 
 
 def splitRepoName(repoShortName: str):
