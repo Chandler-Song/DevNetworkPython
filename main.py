@@ -58,7 +58,7 @@ def main(argv):
         commits = list(replaceAliases(repo.iter_commits(), config.aliasPath))
 
         # run analysis
-        graphqlAnalysis(pat, config.repositoryShortname)
+        graphqlAnalysis(pat, config.repositoryShortname, config.analysisOutputPath)
         # tagAnalysis(repo, config.analysisOutputPath)
         # commitAnalysis(commits, config.analysisOutputPath)
         # centralityAnalysis(repo, commits, config.analysisOutputPath)
