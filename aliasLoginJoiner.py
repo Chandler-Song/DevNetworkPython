@@ -96,52 +96,53 @@ def extractAliases(
         aliasEmails.append(email)
         usedAsValues[email] = login
 
-    for authorA in Bar("Processing").iter(emailsWithoutLogins):
-        quickMatched = False
+    if (len(emailsWithoutLogins) > 0):
+        for authorA in Bar("Processing").iter(emailsWithoutLogins):
+            quickMatched = False
 
-        # go through used values
-        for key in usedAsValues:
-            if authorA == key:
-                quickMatched = True
+            # go through used values
+            for key in usedAsValues:
+                if authorA == key:
+                    quickMatched = True
+                    continue
+
+                if areSimilar(authorA, key, maxDistance):
+                    alias = usedAsValues[key]
+                    aliases[alias].append(authorA)
+                    usedAsValues[authorA] = alias
+                    quickMatched = True
+                    break
+
+            if quickMatched:
                 continue
 
-            if areSimilar(authorA, key, maxDistance):
-                alias = usedAsValues[key]
-                aliases[alias].append(authorA)
-                usedAsValues[authorA] = alias
-                quickMatched = True
-                break
+            # go through already extracted keys
+            for key in aliases:
+                if authorA == key:
+                    quickMatched = True
+                    continue
 
-        if quickMatched:
-            continue
+                if areSimilar(authorA, key, maxDistance):
+                    aliases[key].append(authorA)
+                    usedAsValues[authorA] = key
+                    quickMatched = True
+                    break
 
-        # go through already extracted keys
-        for key in aliases:
-            if authorA == key:
-                quickMatched = True
+            if quickMatched:
                 continue
 
-            if areSimilar(authorA, key, maxDistance):
-                aliases[key].append(authorA)
-                usedAsValues[authorA] = key
-                quickMatched = True
-                break
+            # go through all authors
+            for authorB in emailsWithoutLogins:
+                if authorA == authorB:
+                    continue
 
-        if quickMatched:
-            continue
+                if areSimilar(authorA, authorB, maxDistance):
+                    aliasedAuthor = aliases.setdefault(authorA, [])
+                    aliasedAuthor.append(authorB)
+                    usedAsValues[authorB] = authorA
+                    break
 
-        # go through all authors
-        for authorB in emailsWithoutLogins:
-            if authorA == authorB:
-                continue
-
-            if areSimilar(authorA, authorB, maxDistance):
-                aliasedAuthor = aliases.setdefault(authorA, [])
-                aliasedAuthor.append(authorB)
-                usedAsValues[authorB] = authorA
-                break
-
-    # output to yaml
+    print("Writing aliases to '{0}'".format(aliasPath))
     if not os.path.exists(os.path.dirname(aliasPath)):
         os.makedirs(os.path.dirname(aliasPath))
 

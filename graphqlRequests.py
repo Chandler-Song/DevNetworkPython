@@ -136,7 +136,7 @@ def getIssueParticipants(pat: str, owner: str, name: str):
 
 def buildGetIssueParticipantsQuery(owner: str, name: str, cursor: str):
     return """{{
-        repository(name: "{0}", owner: "{1}") {{
+        repository(owner: "{0}", name: "{1}") {{
             issues(first: 100{2}){{
                 pageInfo {{
                     hasNextPage
@@ -223,7 +223,7 @@ def getPullRequestParticipants(pat: str, owner: str, name: str):
 
 def buildGetPullRequestParticipantsQuery(owner: str, name: str, cursor: str):
     return """{{
-        repository(name: "{0}", owner: "{1}") {{
+        repository(owner: "{0}", name: "{1}") {{
             pullRequests(first: 100{2}){{
                 pageInfo {{
                     hasNextPage

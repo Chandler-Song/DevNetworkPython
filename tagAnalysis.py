@@ -12,22 +12,23 @@ def tagAnalysis(repo: git.Repo, outputDir: str):
     print("Sorting (no progress available, may take several minutes to complete)")
     tags = sorted(repo.tags, key=getTaggedDate)
     
-    lastTag = None
-    for tag in Bar('Processing').iter(tags):
-        commitCount = 0
-        if (lastTag == None):
-            commitCount = len(list(tag.commit.iter_items(repo, tag.commit)))
-        else:
-            sinceStr = formatDate(getTaggedDate(lastTag))
-            commitCount = len(list(tag.commit.iter_items(repo, tag.commit, after=sinceStr)))
-        
-        tagInfo.append(dict(
-            path=tag.path,
-            date= formatDate(getTaggedDate(tag)),
-            commitCount= commitCount
-        ))
-        
-        lastTag = tag
+    if len(tags) > 0:
+        lastTag = None
+        for tag in Bar('Processing').iter(tags):
+            commitCount = 0
+            if (lastTag == None):
+                commitCount = len(list(tag.commit.iter_items(repo, tag.commit)))
+            else:
+                sinceStr = formatDate(getTaggedDate(lastTag))
+                commitCount = len(list(tag.commit.iter_items(repo, tag.commit, after=sinceStr)))
+            
+            tagInfo.append(dict(
+                path=tag.path,
+                date= formatDate(getTaggedDate(tag)),
+                commitCount= commitCount
+            ))
+            
+            lastTag = tag
 
     # output non-tabular results
     with open(os.path.join(outputDir, 'project.csv'), 'a', newline='') as f:

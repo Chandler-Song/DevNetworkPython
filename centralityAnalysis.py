@@ -50,6 +50,8 @@ def centralityAnalysis(repo: git.Repo, commits: List[git.Commit], outputDir: str
     G = nx.Graph()
     
     for author in allRelatedAuthors:
+        G.add_node(author)
+
         for relatedAuthor in allRelatedAuthors[author]:
             G.add_edge(author.strip(), relatedAuthor.strip())
        
@@ -58,7 +60,13 @@ def centralityAnalysis(repo: git.Repo, commits: List[git.Commit], outputDir: str
     betweenness = dict(nx.betweenness_centrality(G))
     centrality = dict(nx.degree_centrality(G))
     density = nx.density(G)
-    modularity = list(greedy_modularity_communities(G))
+
+    modularity = []
+    try:
+        modularity = list(greedy_modularity_communities(G))
+    except ZeroDivisionError:
+        # not handled
+        pass
     
     print("Outputting CSVs")
     

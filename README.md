@@ -5,7 +5,6 @@
 - VSCode 1.45.1
 - PowerShell 7.0.1
 - Python 3.8.3
-- PIP 20.1.1
 - Black (formatter)
 
 ## Python Modules
