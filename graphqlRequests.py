@@ -88,7 +88,9 @@ def buildCountCommitsPerPullRequestQuery(owner: str, name: str, cursor: str):
 def getIssueParticipants(pat: str, owner: str, name: str):
     query = buildGetIssueParticipantsQuery(owner, name, None)
 
-    issueParticipants = set()
+    participants = set()
+    participantCount = dict()
+
     while True:
 
         # get page of PRs
@@ -98,25 +100,32 @@ def getIssueParticipants(pat: str, owner: str, name: str):
         nodes = result["repository"]["issues"]["nodes"]
 
         # add participants to list
-        for issue in nodes:
+        for node in nodes:
+            count = 0
 
             # author
-            author = issue["author"]
+            author = node["author"]
             if not author is None:
-                issueParticipants.add(author["login"])
+                participants.add(author["login"])
+                count += 1
 
             # editor
-            editor = issue["editor"]
+            editor = node["editor"]
             if not editor is None:
-                issueParticipants.add(editor["login"])
+                participants.add(editor["login"])
+                count += 1
 
             # assignees
-            for user in issue["assignees"]["nodes"]:
-                issueParticipants.add(user["login"])
+            for user in node["assignees"]["nodes"]:
+                participants.add(user["login"])
+                count += 1
 
             # participants
-            for user in issue["participants"]["nodes"]:
-                issueParticipants.add(user["login"])
+            for user in node["participants"]["nodes"]:
+                participants.add(user["login"])
+                count += 1
+
+            participantCount[node["number"]] = count
 
         # check for next page
         pageInfo = result["repository"]["issues"]["pageInfo"]
@@ -126,7 +135,7 @@ def getIssueParticipants(pat: str, owner: str, name: str):
         cursor = pageInfo["endCursor"]
         query = buildGetIssueParticipantsQuery(owner, name, cursor)
 
-    return issueParticipants
+    return participants, participantCount
 
 
 def buildGetIssueParticipantsQuery(owner: str, name: str, cursor: str):
@@ -138,6 +147,98 @@ def buildGetIssueParticipantsQuery(owner: str, name: str, cursor: str):
                     endCursor
                 }}
                 nodes {{
+                    number
+                    author {{
+                        ... on User {{
+                            login
+                        }}
+                    }}
+                    editor {{
+                        ... on User {{
+                            login
+                        }}
+                    }}
+                    assignees(first: 100) {{
+                        nodes {{
+                            login
+                        }}
+                    }}
+                    participants(first: 100) {{
+                        nodes {{
+                            login
+                        }}
+                    }}
+                }}
+            }}
+        }}
+    }}""".format(
+        owner, name, buildNextPageQuery(cursor)
+    )
+
+
+def getPullRequestParticipants(pat: str, owner: str, name: str):
+    query = buildGetPullRequestParticipantsQuery(owner, name, None)
+
+    participants = set()
+    participantCount = dict()
+
+    while True:
+
+        # get page of PRs
+        result = runGraphqlRequest(pat, query)
+
+        # extract nodes
+        nodes = result["repository"]["pullRequests"]["nodes"]
+
+        # add participants to list
+        for node in nodes:
+            count = 0
+
+            # author
+            author = node["author"]
+            if not author is None:
+                participants.add(author["login"])
+                count += 1
+
+            # editor
+            editor = node["editor"]
+            if not editor is None:
+                participants.add(editor["login"])
+                count += 1
+
+            # assignees
+            for user in node["assignees"]["nodes"]:
+                participants.add(user["login"])
+                count += 1
+
+            # participants
+            for user in node["participants"]["nodes"]:
+                participants.add(user["login"])
+                count += 1
+
+            participantCount[node["number"]] = count
+
+        # check for next page
+        pageInfo = result["repository"]["pullRequests"]["pageInfo"]
+        if not pageInfo["hasNextPage"]:
+            break
+
+        cursor = pageInfo["endCursor"]
+        query = buildGetPullRequestParticipantsQuery(owner, name, cursor)
+
+    return participants, participantCount
+
+
+def buildGetPullRequestParticipantsQuery(owner: str, name: str, cursor: str):
+    return """{{
+        repository(name: "core", owner: "dotnet") {{
+            pullRequests(first: 100{2}){{
+                pageInfo {{
+                    hasNextPage
+                    endCursor
+                }}
+                nodes {{
+                    number
                     author {{
                         ... on User {{
                             login

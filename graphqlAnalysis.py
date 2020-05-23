@@ -8,35 +8,41 @@ def graphqlAnalysis(pat: str, repoShortName: str, outputDir: str):
     # split repo by owner and name
     owner, name = splitRepoName(repoShortName)
 
-    # # number of issues per repository
-    # issueCount = gql.countIssuesPerRepository(pat, owner, name)
+    print("Querying number of issues per repository")
+    issueCount = gql.countIssuesPerRepository(pat, owner, name)
 
-    # # number of PRs per repository
-    # prCount = gql.countPullRequestsPerRepository(pat, owner, name)
+    print("Querying number of PRs per repository")
+    prCount = gql.countPullRequestsPerRepository(pat, owner, name)
 
-    # # number of commits per PR
-    # prCommitCount = gql.countCommitsPerPullRequest(pat, owner, name)
+    print("Querying number of commits per PR")
+    prCommitCount = gql.countCommitsPerPullRequest(pat, owner, name)
 
-    # select all issue participants
-    issueParticipants = gql.getIssueParticipants(pat, owner, name)
+    print("Querying issue participants")
+    issueParticipants, issueParticipantCount = gql.getIssueParticipants(
+        pat, owner, name
+    )
 
-    # select all PR participants
+    print("Querying PR participants")
+    prParticipants, prParticipantCount = gql.getPullRequestParticipants(
+        pat, owner, name
+    )
 
-    # join lists
+    # join lists and clean memory
+    participants = issueParticipants.update(prParticipants)
+    del issueParticipants
+    del prParticipants
 
-    # select distinct user logins
-
-    # number of developers per issue
-
-    # number of developers per PR
-
-    # output
+    print("Writing GraphQL analysis results")
     with open(os.path.join(outputDir, "graphqlAnalysis.csv"), "a", newline="") as f:
         w = csv.writer(f, delimiter=",")
         w.writerow(["NumberIssues", issueCount])
         w.writerow(["NumberPRs", prCount])
+        w.writerow(["NumberDevelopersIssue", issueParticipantCount])
+        w.writerow(["NumberDevelopersPR", prParticipantCount])
 
-    with open(os.path.join(outputDir, "commitsPerPR.csv"), "a", newline="") as f:
+    with open(
+        os.path.join(outputDir, "commitsPerPullRequest.csv"), "a", newline=""
+    ) as f:
         w = csv.writer(f, delimiter=",")
         w.writerow(["PR Number", "Commit Count"])
         for prNumber in prCommitCount.keys():
