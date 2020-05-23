@@ -104,26 +104,22 @@ def getIssueParticipants(pat: str, owner: str, name: str):
             count = 0
 
             # author
-            author = node["author"]
-            if not author is None:
-                participants.add(author["login"])
+            if tryAddAuthorLogin(node["author"], participants):
                 count += 1
 
             # editor
-            editor = node["editor"]
-            if not editor is None:
-                participants.add(editor["login"])
+            if tryAddAuthorLogin(node["editor"], participants):
                 count += 1
 
             # assignees
             for user in node["assignees"]["nodes"]:
-                participants.add(user["login"])
-                count += 1
+                if tryAddAuthorLogin(user, participants):
+                    count += 1
 
             # participants
             for user in node["participants"]["nodes"]:
-                participants.add(user["login"])
-                count += 1
+                if tryAddAuthorLogin(user, participants):
+                    count += 1
 
             participantCount[node["number"]] = count
 
@@ -195,26 +191,22 @@ def getPullRequestParticipants(pat: str, owner: str, name: str):
             count = 0
 
             # author
-            author = node["author"]
-            if not author is None:
-                participants.add(author["login"])
+            if tryAddAuthorLogin(node["author"], participants):
                 count += 1
 
             # editor
-            editor = node["editor"]
-            if not editor is None:
-                participants.add(editor["login"])
+            if tryAddAuthorLogin(node["editor"], participants):
                 count += 1
 
             # assignees
             for user in node["assignees"]["nodes"]:
-                participants.add(user["login"])
-                count += 1
+                if tryAddAuthorLogin(user, participants):
+                    count += 1
 
             # participants
             for user in node["participants"]["nodes"]:
-                participants.add(user["login"])
-                count += 1
+                if tryAddAuthorLogin(user, participants):
+                    count += 1
 
             participantCount[node["number"]] = count
 
@@ -227,6 +219,23 @@ def getPullRequestParticipants(pat: str, owner: str, name: str):
         query = buildGetPullRequestParticipantsQuery(owner, name, cursor)
 
     return participants, participantCount
+
+
+def tryAddAuthorLogin(node, list: set):
+    login = extractAuthorLogin(node)
+
+    if not login is None:
+        list.add(login)
+        return True
+
+    return False
+
+
+def extractAuthorLogin(node):
+    if node is None or not "login" in node or node["login"] is None:
+        return None
+
+    return node["login"]
 
 
 def buildGetPullRequestParticipantsQuery(owner: str, name: str, cursor: str):

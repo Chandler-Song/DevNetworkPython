@@ -8,10 +8,10 @@ def graphqlAnalysis(pat: str, repoShortName: str, outputDir: str):
     # split repo by owner and name
     owner, name = splitRepoName(repoShortName)
 
-    print("Querying number of issues per repository")
+    print("Querying number of issues")
     issueCount = gql.countIssuesPerRepository(pat, owner, name)
 
-    print("Querying number of PRs per repository")
+    print("Querying number of PRs")
     prCount = gql.countPullRequestsPerRepository(pat, owner, name)
 
     print("Querying number of commits per PR")
@@ -37,16 +37,26 @@ def graphqlAnalysis(pat: str, repoShortName: str, outputDir: str):
         w = csv.writer(f, delimiter=",")
         w.writerow(["NumberIssues", issueCount])
         w.writerow(["NumberPRs", prCount])
-        w.writerow(["NumberDevelopersIssue", issueParticipantCount])
-        w.writerow(["NumberDevelopersPR", prParticipantCount])
 
-    with open(
-        os.path.join(outputDir, "commitsPerPullRequest.csv"), "a", newline=""
-    ) as f:
+    with open(os.path.join(outputDir, "numberCommitsPR.csv"), "a", newline="") as f:
         w = csv.writer(f, delimiter=",")
         w.writerow(["PR Number", "Commit Count"])
         for prNumber in prCommitCount.keys():
             w.writerow([prNumber, prCommitCount[prNumber]])
+
+    with open(
+        os.path.join(outputDir, "numberDevelopersIssue.csv"), "a", newline=""
+    ) as f:
+        w = csv.writer(f, delimiter=",")
+        w.writerow(["Issue Number", "Developer Count"])
+        for prNumber in issueParticipantCount.keys():
+            w.writerow([issueParticipantCount, issueParticipantCount[prNumber]])
+
+    with open(os.path.join(outputDir, "numberDevelopersPR.csv"), "a", newline="") as f:
+        w = csv.writer(f, delimiter=",")
+        w.writerow(["PR Number", "Developer Count"])
+        for prNumber in prParticipantCount.keys():
+            w.writerow([prParticipantCount, prParticipantCount[prNumber]])
 
 
 def splitRepoName(repoShortName: str):
