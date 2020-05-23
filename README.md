@@ -5,20 +5,21 @@
 - VSCode 1.45.1
 - PowerShell 7.0.1
 - Python 3.8.3
-- PIP 20.1
+- PIP 20.1.1
 - Black (formatter)
 
 ## Python Modules
 Modules can be be installed by running **installModules.ps1** in PowerShell. This will create an embedded **venv** environment and install all necessary modules with correct versions without polluting the global namespace.
 
 # Running
-To run the tool you need to setup a configuration file **[something].yml** and run **main.py** with the **-c** or **--config** parameter pointing to the physical location of the configuration file.
+To run the tool you need to setup a configuration file **[something].yml** and run **main.py** with the right parameters:
+- **-c** (**--config**): physical location of the configuration file
+- **-p** (**--pat**): GitHub PAT (personal access token) used for querying the GitHub API
 
-An example configuration file using the explained parameters and values below is included in the repository.
+Your final result should look like this:  
+**$ py main.py -c config.yml -p abc123456**
 
-*$ python main.py -c config.yml*
-
-## Configuration
+## Configuration File
 
 #### repositoryUrl (str)
 The URL to the GitHub repository you want to analyse.  
@@ -45,3 +46,9 @@ The physical path to the list of author aliases.
 For documentation on changing this value see:  
 https://github.com/luozhouyang/python-string-similarity#metric-longest-common-subsequence  
 *Ex: 0.25*
+
+# Aliases
+It is recommended to generate and massage author aliases prior to analyzing repositories to minimize the number of duplicate users who have historically used multiple emails for their commits skewing the developer network analysis.
+
+To generate the initial aliases, run the **aliasLoginJoiner.py** file followed by your PAT as the first parameter:  
+**$ py aliasLoginJoiner.py abc123456**

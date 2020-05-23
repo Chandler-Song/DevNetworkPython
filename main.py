@@ -59,9 +59,9 @@ def main(argv):
 
         # run analysis
         graphqlAnalysis(pat, config.repositoryShortname, config.analysisOutputPath)
-        # tagAnalysis(repo, config.analysisOutputPath)
-        # commitAnalysis(commits, config.analysisOutputPath)
-        # centralityAnalysis(repo, commits, config.analysisOutputPath)
+        tagAnalysis(repo, config.analysisOutputPath)
+        commitAnalysis(commits, config.analysisOutputPath)
+        centralityAnalysis(repo, commits, config.analysisOutputPath)
 
         # open output directory
         explore(config.analysisOutputPath)

@@ -136,7 +136,7 @@ def getIssueParticipants(pat: str, owner: str, name: str):
 
 def buildGetIssueParticipantsQuery(owner: str, name: str, cursor: str):
     return """{{
-        repository(name: "core", owner: "dotnet") {{
+        repository(name: "{0}", owner: "{1}") {{
             issues(first: 100{2}){{
                 pageInfo {{
                     hasNextPage
@@ -221,26 +221,9 @@ def getPullRequestParticipants(pat: str, owner: str, name: str):
     return participants, participantCount
 
 
-def tryAddAuthorLogin(node, list: set):
-    login = extractAuthorLogin(node)
-
-    if not login is None:
-        list.add(login)
-        return True
-
-    return False
-
-
-def extractAuthorLogin(node):
-    if node is None or not "login" in node or node["login"] is None:
-        return None
-
-    return node["login"]
-
-
 def buildGetPullRequestParticipantsQuery(owner: str, name: str, cursor: str):
     return """{{
-        repository(name: "core", owner: "dotnet") {{
+        repository(name: "{0}", owner: "{1}") {{
             pullRequests(first: 100{2}){{
                 pageInfo {{
                     hasNextPage
@@ -293,3 +276,20 @@ def runGraphqlRequest(pat: str, query: str):
     raise "Query execution failed with code {0}: {1}".format(
         request.status_code, request.text
     )
+
+
+def tryAddAuthorLogin(node, list: set):
+    login = extractAuthorLogin(node)
+
+    if not login is None:
+        list.add(login)
+        return True
+
+    return False
+
+
+def extractAuthorLogin(node):
+    if node is None or not "login" in node or node["login"] is None:
+        return None
+
+    return node["login"]
