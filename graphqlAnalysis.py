@@ -7,8 +7,9 @@ def graphqlAnalysis(pat: str, repoShortName: str):
     owner, name = splitRepoName(repoShortName)
 
     # run graphql requests
-    issueCount = gql.getIssuesPerRepository(pat, owner, name)
-    prCount = gql.getPullRequestsPerRepository(pat, owner, name)
+    issueCount = gql.countIssuesPerRepository(pat, owner, name)
+    prCount = gql.countPullRequestsPerRepository(pat, owner, name)
+    prCommitCount = gql.countCommitsPerPullRequest(pat, owner, name)
 
 
 def splitRepoName(repoShortName: str):
