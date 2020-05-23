@@ -6,6 +6,7 @@
 - PowerShell 7.0.1
 - Python 3.8.3
 - PIP 20.1
+- Black (formatter)
 
 ## Python Modules
 Modules can be be installed by running **installModules.ps1** in PowerShell. This will create an embedded **venv** environment and install all necessary modules with correct versions without polluting the global namespace.

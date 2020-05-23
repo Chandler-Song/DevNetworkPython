@@ -18,7 +18,7 @@ def replaceAliases(commits: List[git.Commit], aliasPath: str):
     with open(aliasPath, 'r', encoding='utf-8-sig') as file:
         content = file.read()
         
-    aliases = yaml.load(content)
+    aliases = yaml.load(content, Loader=yaml.FullLoader)
     
     # transpose for easy replacements
     transposesAliases = {}
