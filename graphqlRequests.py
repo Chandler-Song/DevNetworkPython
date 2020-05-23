@@ -85,6 +85,87 @@ def buildCountCommitsPerPullRequestQuery(owner: str, name: str, cursor: str):
     )
 
 
+def getIssueParticipants(pat: str, owner: str, name: str):
+    query = buildGetIssueParticipantsQuery(owner, name, None)
+
+    issueParticipants = set()
+    while True:
+
+        # get page of PRs
+        result = runGraphqlRequest(pat, query)
+
+        # extract nodes
+        nodes = result["repository"]["issues"]["nodes"]
+
+        # add participants to list
+        for issue in nodes:
+
+            # author
+            author = issue["author"]
+            if not author is None:
+                issueParticipants.add(author["login"])
+
+            # editor
+            editor = issue["editor"]
+            if not editor is None:
+                issueParticipants.add(editor["login"])
+
+            # assignees
+            for user in issue["assignees"]["nodes"]:
+                issueParticipants.add(user["login"])
+
+            # participants
+            for user in issue["participants"]["nodes"]:
+                issueParticipants.add(user["login"])
+
+        # check for next page
+        pageInfo = result["repository"]["issues"]["pageInfo"]
+        if not pageInfo["hasNextPage"]:
+            break
+
+        cursor = pageInfo["endCursor"]
+        query = buildGetIssueParticipantsQuery(owner, name, cursor)
+
+    return issueParticipants
+
+
+def buildGetIssueParticipantsQuery(owner: str, name: str, cursor: str):
+    return """{{
+        repository(name: "core", owner: "dotnet") {{
+            issues(first: 100{2}){{
+                pageInfo {{
+                    hasNextPage
+                    endCursor
+                }}
+                nodes {{
+                    author {{
+                        ... on User {{
+                            login
+                        }}
+                    }}
+                    editor {{
+                        ... on User {{
+                            login
+                        }}
+                    }}
+                    assignees(first: 100) {{
+                        nodes {{
+                            login
+                        }}
+                    }}
+                    participants(first: 100) {{
+                        nodes {{
+                            login
+                        }}
+                    }}
+                }}
+            }}
+        }}
+    }}""".format(
+        owner, name, buildNextPageQuery(cursor)
+    )
+
+
 def buildNextPageQuery(cursor: str):
     if cursor is None:
         return ""

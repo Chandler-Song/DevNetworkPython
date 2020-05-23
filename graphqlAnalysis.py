@@ -8,10 +8,27 @@ def graphqlAnalysis(pat: str, repoShortName: str, outputDir: str):
     # split repo by owner and name
     owner, name = splitRepoName(repoShortName)
 
-    # run graphql requests
-    issueCount = gql.countIssuesPerRepository(pat, owner, name)
-    prCount = gql.countPullRequestsPerRepository(pat, owner, name)
-    prCommitCount = gql.countCommitsPerPullRequest(pat, owner, name)
+    # # number of issues per repository
+    # issueCount = gql.countIssuesPerRepository(pat, owner, name)
+
+    # # number of PRs per repository
+    # prCount = gql.countPullRequestsPerRepository(pat, owner, name)
+
+    # # number of commits per PR
+    # prCommitCount = gql.countCommitsPerPullRequest(pat, owner, name)
+
+    # select all issue participants
+    issueParticipants = gql.getIssueParticipants(pat, owner, name)
+
+    # select all PR participants
+
+    # join lists
+
+    # select distinct user logins
+
+    # number of developers per issue
+
+    # number of developers per PR
 
     # output
     with open(os.path.join(outputDir, "graphqlAnalysis.csv"), "a", newline="") as f:
