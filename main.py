@@ -59,11 +59,11 @@ def main(argv):
         commits = list(replaceAliases(repo.iter_commits(), config.aliasPath))
 
         # run analysis
-        # tagAnalysis(repo, config.analysisOutputPath)
+        tagAnalysis(repo, config.analysisOutputPath)
         authorInfoDict = commitAnalysis(commits, config.analysisOutputPath)
-        # centralityAnalysis(repo, commits, config.analysisOutputPath)
-        # issueOrPrDevs = graphqlAnalysis(pat, config.repositoryShortname, config.analysisOutputPath)
-        # devAnalysis(authorInfoDict, issueOrPrDevs, config.analysisOutputPath)
+        centralityAnalysis(repo, commits, config.analysisOutputPath)
+        issueOrPrDevs = graphqlAnalysis(pat, config.repositoryShortname, config.analysisOutputPath)
+        devAnalysis(authorInfoDict, issueOrPrDevs, config.analysisOutputPath)
 
         # open output directory
         explore(config.analysisOutputPath)
