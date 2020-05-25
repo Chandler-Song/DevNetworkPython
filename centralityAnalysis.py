@@ -67,6 +67,9 @@ def centralityAnalysis(repo: git.Repo, commits: List[git.Commit], outputDir: str
     except ZeroDivisionError:
         # not handled
         pass
+
+    # finding high centrality authors
+    numberHighCentralityAuthors = len([author for author, centrality in centrality.items() if centrality > 0.5])
     
     print("Outputting CSVs")
     
@@ -103,6 +106,11 @@ def centralityAnalysis(repo: git.Repo, commits: List[git.Commit], outputDir: str
         
         for key in combined:
             w.writerow(combined[key])
+
+    # output high centrality authors
+    with open(os.path.join(outputDir, "project.csv"), "a", newline="") as f:
+        w = csv.writer(f, delimiter=",")
+        w.writerow(["NumberHighCentralityAuthors", numberHighCentralityAuthors])
             
     # output graph to PNG
     print("Outputting graph to PNG")

@@ -9,6 +9,7 @@ from commitAnalysis import commitAnalysis
 from centralityAnalysis import centralityAnalysis
 from tagAnalysis import tagAnalysis
 from graphqlAnalysis import graphqlAnalysis
+from devAnalysis import devAnalysis
 
 FILEBROWSER_PATH = os.path.join(os.getenv("WINDIR"), "explorer.exe")
 
@@ -48,7 +49,7 @@ def main(argv):
         # get repository reference
         repo = getRepo(config)
 
-        # delete any existing output files
+        # delete any existing output files for repo
         if os.path.exists(config.analysisOutputPath):
             shutil.rmtree(config.analysisOutputPath)
 
@@ -58,10 +59,11 @@ def main(argv):
         commits = list(replaceAliases(repo.iter_commits(), config.aliasPath))
 
         # run analysis
-        graphqlAnalysis(pat, config.repositoryShortname, config.analysisOutputPath)
-        tagAnalysis(repo, config.analysisOutputPath)
-        commitAnalysis(commits, config.analysisOutputPath)
-        centralityAnalysis(repo, commits, config.analysisOutputPath)
+        # tagAnalysis(repo, config.analysisOutputPath)
+        authorInfoDict = commitAnalysis(commits, config.analysisOutputPath)
+        # centralityAnalysis(repo, commits, config.analysisOutputPath)
+        # issueOrPrDevs = graphqlAnalysis(pat, config.repositoryShortname, config.analysisOutputPath)
+        # devAnalysis(authorInfoDict, issueOrPrDevs, config.analysisOutputPath)
 
         # open output directory
         explore(config.analysisOutputPath)

@@ -259,6 +259,54 @@ def buildGetPullRequestParticipantsQuery(owner: str, name: str, cursor: str):
     )
 
 
+def getIssueComments(pat: str, owner: str, name: str):
+    issueCommentCount = dict()
+    cursor = None
+
+    while True:
+
+        # get page of PRs
+        query = buildGetIssueCommentsQuery(owner, name, cursor)
+        result = runGraphqlRequest(pat, query)
+
+        # extract nodes
+        nodes = result["repository"]["issues"]["nodes"]
+
+        # get count
+        for node in nodes:
+            issueCommentCount[node["number"]] = node["comments"]["totalCount"]
+
+        # check for next page
+        pageInfo = result["repository"]["issues"]["pageInfo"]
+        if not pageInfo["hasNextPage"]:
+            break
+
+        cursor = pageInfo["endCursor"]
+
+    return issueCommentCount
+
+
+def buildGetIssueCommentsQuery(owner: str, name: str, cursor: str):
+    return """{{
+        repository(owner: "{0}", name: "{1}") {{
+            issues(first: 100{2}) {{
+                pageInfo {{
+                    hasNextPage
+                    endCursor
+                }}
+                nodes {{
+                    number
+                    comments {{
+                        totalCount
+                    }}
+                }}
+            }}
+        }}
+    }}""".format(
+        owner, name, buildNextPageQuery(cursor)
+    )
+
+
 def buildNextPageQuery(cursor: str):
     if cursor is None:
         return ""
