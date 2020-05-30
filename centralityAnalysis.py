@@ -66,7 +66,7 @@ def centralityAnalysis(repo: git.Repo, commits: List[git.Commit], outputDir: str
     centrality = dict(nx.degree_centrality(G))
     density = nx.density(G)
     modularity = []
-    
+
     try:
         for idx, community in enumerate(greedy_modularity_communities(G)):
             authorCount = len(community)
@@ -80,6 +80,10 @@ def centralityAnalysis(repo: git.Repo, commits: List[git.Commit], outputDir: str
     # finding high centrality authors
     numberHighCentralityAuthors = len(
         [author for author, centrality in centrality.items() if centrality > 0.5]
+    )
+
+    percentageHighCentralityAuthors = numberHighCentralityAuthors / len(
+        allRelatedAuthors
     )
 
     print("Outputting CSVs")
@@ -121,6 +125,7 @@ def centralityAnalysis(repo: git.Repo, commits: List[git.Commit], outputDir: str
     with open(os.path.join(outputDir, "project.csv"), "a", newline="") as f:
         w = csv.writer(f, delimiter=",")
         w.writerow(["NumberHighCentralityAuthors", numberHighCentralityAuthors])
+        w.writerow(["PercentageHighCentralityAuthors", percentageHighCentralityAuthors])
 
     # output statistics
     outputStatistics(
