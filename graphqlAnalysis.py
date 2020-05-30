@@ -1,6 +1,7 @@
 import graphqlRequests as gql
 import os
 import csv
+from statsAnalysis import outputStatistics
 
 
 def graphqlAnalysis(pat: str, repoShortName: str, outputDir: str):
@@ -44,28 +45,51 @@ def graphqlAnalysis(pat: str, repoShortName: str, outputDir: str):
     with open(os.path.join(outputDir, "numberCommitsPR.csv"), "a", newline="") as f:
         w = csv.writer(f, delimiter=",")
         w.writerow(["PR Number", "Commit Count"])
-        for key in prCommitCount.keys():
-            w.writerow([key, prCommitCount[key]])
+        for key, value in prCommitCount.items():
+            w.writerow([key, value])
 
     with open(
         os.path.join(outputDir, "numberDevelopersIssue.csv"), "a", newline=""
     ) as f:
         w = csv.writer(f, delimiter=",")
         w.writerow(["Issue Number", "Developer Count"])
-        for key in issueParticipantCount.keys():
-            w.writerow([key, issueParticipantCount[key]])
+        for key, value in issueParticipantCount.items():
+            w.writerow([key, value])
 
     with open(os.path.join(outputDir, "numberDevelopersPR.csv"), "a", newline="") as f:
         w = csv.writer(f, delimiter=",")
         w.writerow(["PR Number", "Developer Count"])
-        for key in prParticipantCount.keys():
-            w.writerow([key, prParticipantCount[key]])
+        for key, value in prParticipantCount.items():
+            w.writerow([key, value])
 
     with open(os.path.join(outputDir, "numberCommentsIssue.csv"), "a", newline="") as f:
         w = csv.writer(f, delimiter=",")
         w.writerow(["PR Number", "Commit Count"])
-        for key in issueCommentCount.keys():
-            w.writerow([key, issueCommentCount[key]])
+        for key, value in issueCommentCount.items():
+            w.writerow([key, value])
+
+    # output statistics
+    outputStatistics(
+        [value for key, value in prCommitCount.items()], "CommitsPRCount", outputDir
+    )
+
+    outputStatistics(
+        [value for key, value in issueParticipantCount.items()],
+        "DevelopersIssueCount",
+        outputDir,
+    )
+
+    outputStatistics(
+        [value for key, value in prParticipantCount.items()],
+        "DevelopersPRCount",
+        outputDir,
+    )
+
+    outputStatistics(
+        [value for key, value in issueCommentCount.items()],
+        "CommentsIssueCount",
+        outputDir,
+    )
 
     return participants
 

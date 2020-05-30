@@ -6,6 +6,7 @@ from typing import List
 from progress.bar import Bar
 from datetime import datetime
 from utils import authorIdExtractor
+from statsAnalysis import outputStatistics
 
 
 def commitAnalysis(commits: List[git.Commit], outputDir: str):
@@ -126,5 +127,17 @@ def commitAnalysis(commits: List[git.Commit], outputDir: str):
         w.writerow(["SponsoredAuthorCount", sponsoredAuthorCount])
         w.writerow(["PercentageSponsoredAuthors", percentageSponsoredAuthors])
         w.writerow(["TimezoneCount", len([*timezoneInfoDict])])
+
+    outputStatistics(
+        [author["activeDays"] for login, author in authorInfoDict.items()],
+        "ActiveDays",
+        outputDir,
+    )
+
+    outputStatistics(
+        [author["commitCount"] for login, author in authorInfoDict.items()],
+        "CommitCount",
+        outputDir,
+    )
 
     return authorInfoDict

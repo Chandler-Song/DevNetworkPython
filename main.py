@@ -51,7 +51,7 @@ def main(argv):
 
         # delete any existing output files for repo
         if os.path.exists(config.analysisOutputPath):
-            shutil.rmtree(config.analysisOutputPath)
+            shutil.rmtree(config.analysisOutputPath, False)
 
         os.makedirs(config.analysisOutputPath)
 
@@ -62,7 +62,9 @@ def main(argv):
         tagAnalysis(repo, config.analysisOutputPath)
         authorInfoDict = commitAnalysis(commits, config.analysisOutputPath)
         centralityAnalysis(repo, commits, config.analysisOutputPath)
-        issueOrPrDevs = graphqlAnalysis(pat, config.repositoryShortname, config.analysisOutputPath)
+        issueOrPrDevs = graphqlAnalysis(
+            pat, config.repositoryShortname, config.analysisOutputPath
+        )
         devAnalysis(authorInfoDict, issueOrPrDevs, config.analysisOutputPath)
 
         # open output directory
